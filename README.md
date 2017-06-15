@@ -30,7 +30,9 @@ TCT_ACCESS_TOKEN_SECRET
 then
 
 ```
-bundle exec rake track
+bundle exec rake export # Audit tweets and export to CSV
+
+bundle exec rake tweet # Audit tweets and post to Twitter timeline with Senator's phone numbers
 ```
 
 ## Development
