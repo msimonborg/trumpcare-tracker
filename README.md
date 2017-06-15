@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Usage
 
-Set the following environment variables
+Register your app with Twitter and set the following environment variables corresponding to your Twitter keys
 ```
 TCT_CONSUMER_KEY
 TCT_CONSUMER_SECRET
