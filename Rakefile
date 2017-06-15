@@ -40,10 +40,17 @@ end
 
 desc 'Audit and tweet results'
 task :tweet do
-  reps = PYR.reps do |r|
-    r.party   = 'democrat'
+  dems = PYR.reps do |r|
+    r.democrat   = true
     r.chamber = 'upper'
   end
+
+  inds = PYR.reps do |r|
+    r.independent = true
+    r.chamber = 'upper'
+  end
+
+  reps = dems.objects.to_a + inds.objects.to_a
 
   audit_tweets(reps) do |tracker, rep|
     tracker.to_tweet
@@ -55,7 +62,7 @@ task :tweet do
 end
 
 def audit_tweets(reps)
-  reps.objects.each_with_index do |rep, i|
+  reps.each_with_index do |rep, i|
     begin
       puts "Sending requests to Twitter API for #{rep.official_full}"
       tracker = TrumpcareTracker.new(rep.twitter)
