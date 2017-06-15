@@ -56,12 +56,24 @@ end
 
 def audit_tweets(reps)
   reps.objects.each_with_index do |rep, i|
-    puts "Sending requests to Twitter API for #{rep.official_full}"
-    tracker = TrumpcareTracker.new(rep.twitter)
-    next if tracker.user.screen_name.downcase != rep.twitter.downcase
-    tracker.audit
-    yield(tracker, rep) if block_given?
-    puts "#{i + 1} down. Pausing for 45 seconds to avoid hitting API rate limit."
-    sleep(45)
+    begin
+      puts "Sending requests to Twitter API for #{rep.official_full}"
+      tracker = TrumpcareTracker.new(rep.twitter)
+      next if rep.twitter.nil?
+      tracker.audit
+      yield(tracker, rep) if block_given?
+      puts "#{i + 1} down. Pausing for 45 seconds to avoid hitting API rate limit."
+      sleep(45)
+    rescue Twitter::Error::TooManyRequests
+      puts 'Rate limit exceeded, waiting 5 minutes'
+      sleep(300)
+      puts "Sending requests to Twitter API for #{rep.official_full}"
+      tracker = TrumpcareTracker.new(rep.twitter)
+      next if rep.twitter.nil?
+      tracker.audit
+      yield(tracker, rep) if block_given?
+      puts "#{i + 1} down. Pausing for 45 seconds to avoid hitting API rate limit."
+      sleep(45)
+    end
   end
 end

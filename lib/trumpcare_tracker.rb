@@ -62,7 +62,7 @@ class TrumpcareTracker
   end
 
   def trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare)/
   end
 
   def russia_tweets
