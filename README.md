@@ -20,6 +20,15 @@ Or install it yourself as:
 
 ## Usage
 
+Set the following environment variables
+```
+TCT_CONSUMER_KEY
+TCT_CONSUMER_SECRET
+TCT_ACCESS_TOKEN
+TCT_ACCESS_TOKEN_SECRET
+```
+then
+
 ```
 bundle exec rake track
 ```

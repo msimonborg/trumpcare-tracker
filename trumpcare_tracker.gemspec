@@ -25,8 +25,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'twitter'
-  spec.add_dependency 'pyr'
+  spec.add_dependency 'twitter', '~> 6.1.0'
+  spec.add_dependency 'pyr', '~> 0.4.0'
 
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 10.0'
