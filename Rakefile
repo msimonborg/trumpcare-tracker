@@ -26,17 +26,17 @@ task :export do
 
   csv_report = CSV.generate do |csv|
     csv << %w[
-        senator
-        user_name
-        tweets_in_last_seven_days
-        trumpcare_tweets
-        tct_percentage
-        russia_tweets
-        rt_percentage
-        tct_to_rt_ratio
-        trumpcare_tweet_urls
-        russia_tweet_urls
-      ]
+      senator
+      user_name
+      tweets_in_last_seven_days
+      trumpcare_tweets
+      tct_percentage
+      russia_tweets
+      rt_percentage
+      tct_to_rt_ratio
+      trumpcare_tweet_urls
+      russia_tweet_urls
+    ]
     audit_tweets(reps) { |tracker| csv << tracker.to_h.values }
   end
 

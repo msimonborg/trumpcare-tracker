@@ -133,6 +133,6 @@ class TrumpcareTracker
   end
 
   def to_tweet
-    client.update(".#{to_s}")
+    client.update(".#{self}")
   end
 end
