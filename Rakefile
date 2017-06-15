@@ -12,10 +12,17 @@ task default: %i[spec rubocop]
 
 desc 'Output a report of Senate Democrats Trumpcare tweets'
 task :export do
-  reps = PYR.reps do |r|
-    r.party = 'democrat'
-    r.chamber = 'upper'
+  dems = PYR.reps do |r|
+    r.democrat = true
+    r.chamber  = 'upper'
   end
+
+  inds = PYR.reps do |r|
+    r.independent = true
+    r.chamber     = 'upper'
+  end
+
+  reps = dems.objects.to_a + inds.objects.to_a
 
   csv_report = CSV.generate do |csv|
     csv << %w[
@@ -41,13 +48,13 @@ end
 desc 'Audit and tweet results'
 task :tweet do
   dems = PYR.reps do |r|
-    r.democrat   = true
-    r.chamber = 'upper'
+    r.democrat = true
+    r.chamber  = 'upper'
   end
 
   inds = PYR.reps do |r|
     r.independent = true
-    r.chamber = 'upper'
+    r.chamber     = 'upper'
   end
 
   reps = dems.objects.to_a + inds.objects.to_a
