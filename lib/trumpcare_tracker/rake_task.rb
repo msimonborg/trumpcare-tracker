@@ -23,7 +23,7 @@ class TrumpcareTracker
       end
 
       def handles
-        @_handles ||= CSV.read('twitter_handles.csv', headers: true)
+        @_handles ||= CSV.read('trumpcare_tracker/twitter_handles.csv', headers: true)
       end
 
       def audit_rep(i, rep, &block)
