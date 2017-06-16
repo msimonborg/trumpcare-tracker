@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'pyr'
 require 'trumpcare_tracker/version'
 require 'twitter'
 
@@ -23,7 +22,7 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles)/
   end
 
   def self.russia_keyword_regex
@@ -141,7 +140,7 @@ class TrumpcareTracker
     alt_screen_name.screen_name
   end
 
-  def to_tweet
-    client.update(".#{self}")
+  def to_tweet(options = {})
+    client.update(".#{self}", options)
   end
 end
