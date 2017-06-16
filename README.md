@@ -45,7 +45,7 @@ TrumpcareTracker::Reporters.new
 run the tasks like so
 
 ```
-bundle exec rake tracker:tweet # Audit tweets and post to Twitter timeline with Senator's phone numbers
+bundle exec rake tracker:tweet_bot # Audit tweets and post to Twitter timeline with Senator's phone numbers
 
 bundle exec rake tracker:export # Audit tweets and export to CSV
 
