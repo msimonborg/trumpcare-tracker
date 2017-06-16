@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'rake'
-require 'rake/tasklib'
 require 'trumpcare_tracker/rake_task'
 
 class TrumpcareTracker

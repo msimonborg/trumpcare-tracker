@@ -2,6 +2,8 @@
 
 require 'csv'
 require 'pyr'
+require 'rake'
+require 'rake/tasklib'
 require 'trumpcare_tracker'
 
 class TrumpcareTracker
@@ -23,7 +25,7 @@ class TrumpcareTracker
       end
 
       def handles
-        @_handles ||= CSV.read('trumpcare_tracker/lib/twitter_handles.csv', headers: true)
+        @_handles ||= CSV.read(File.expand_path('../twitter_handles.csv', __FILE__), headers: true)
       end
 
       def audit_rep(i, rep, &block)
