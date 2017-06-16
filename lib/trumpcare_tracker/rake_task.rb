@@ -3,7 +3,7 @@
 require 'csv'
 require 'pyr'
 require 'trumpcare_tracker'
-require 'trumpcare_tracker/twitter_handles'
+require 'trumpcare_tracker/twitter_handles.csv'
 
 class TrumpcareTracker
   # Base rake task class
