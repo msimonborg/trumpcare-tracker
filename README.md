@@ -27,12 +27,29 @@ TCT_CONSUMER_SECRET
 TCT_ACCESS_TOKEN
 TCT_ACCESS_TOKEN_SECRET
 ```
-then
+then add the following to your Rakefile
+
+```ruby
+require 'trumpcare_tracker/tweet_bot'
+require 'trumpcare_tracker/reporters'
+
+# Rake task to audit tweets and post a thread with results and Senators' phone numbers
+TrumpcareTracker::TweetBot.new('twitter_user_name') do
+  "Optional lets you add a custom intro tweet for the thread."
+end
+
+# Adds two rake tasks. One audits tweets and the other audits the Senators' website homepages. Both export the results to CSV in project root directory.
+TrumpcareTracker::Reporters.new
+```
+
+run the tasks like so
 
 ```
-bundle exec rake export # Audit tweets and export to CSV
+bundle exec rake tracker:tweet # Audit tweets and post to Twitter timeline with Senator's phone numbers
 
-bundle exec rake tweet # Audit tweets and post to Twitter timeline with Senator's phone numbers
+bundle exec rake tracker:export # Audit tweets and export to CSV
+
+bundle exec rake tracker:homepage_scraper # Audit websites and export to CSV
 ```
 
 ## Development
