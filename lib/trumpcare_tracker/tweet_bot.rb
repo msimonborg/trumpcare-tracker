@@ -8,7 +8,9 @@ class TrumpcareTracker
   # Provide a tweet bot that can be run as a rake task
   #
   # require 'trumpcare_tracker/tweet_bot'
-  # TrumpcareTracker::TweetBot.new
+  # TrumpcareTracker::TweetBot.new('screen_user_name') do
+  #   "Text for optional intro tweet to thread"
+  # end
   #
   # $ bundle exec rake tracker:tweet_bot
   class TweetBot < RakeTask
