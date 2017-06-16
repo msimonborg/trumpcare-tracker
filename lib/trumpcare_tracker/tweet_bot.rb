@@ -37,6 +37,12 @@ class TrumpcareTracker
               puts 'Waiting 5 minutes to see if the issue can be resolved.'
               sleep(300)
               tweet = post(rep, i, reply_to_tweet)
+            rescue Twitter::Error => e
+              puts e.message
+              puts 'Waiting 5 more minutes to try one more time. '\
+                'If there\'s another exception I\'ll let it fail'
+              sleep(300)
+              tweet = post(rep, i, reply_to_tweet)
             end
           end
         end
