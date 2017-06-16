@@ -11,10 +11,12 @@ class TrumpcareTracker
   ACCESS_TOKEN        = ENV['TCT_ACCESS_TOKEN']
   ACCESS_TOKEN_SECRET = ENV['TCT_ACCESS_TOKEN_SECRET']
 
-  attr_reader :user
+  attr_reader :user, :screen_name, :alt_screen_name
 
-  def initialize(user)
-    @user = client.user user
+  def initialize(user, screen_name, alt_screen_name = nil)
+    @user            = user
+    @screen_name     = client.user screen_name
+    @alt_screen_name = client.user alt_screen_name if alt_screen_name
   end
 
   # Instantiate a Twitter Rest Client with API authorization
@@ -28,14 +30,15 @@ class TrumpcareTracker
   end
 
   def timeline
-    @_timeline ||= fetch_timeline
+    @_timeline ||= (fetch_timeline(screen_name) + fetch_timeline(alt_screen_name))
   end
 
   # Make two cursored API calls to fetch the 400 most recent tweets
-  def fetch_timeline
-    timeline = client.user_timeline(user, exclude_replies: true, count: 200)
+  def fetch_timeline(screen_name)
+    return [] unless screen_name
+    timeline = client.user_timeline(screen_name, exclude_replies: true, count: 200)
     timeline + client.user_timeline(
-      user,
+      screen_name,
       exclude_replies: true,
       max_id: timeline.last.id - 1,
       count: 200
@@ -58,18 +61,18 @@ class TrumpcareTracker
   end
 
   def trumpcare_tweets
-    @_trumpcare_tweets ||= reduce_by_keywords(trumpcare_keyword_regex)
+    @_trumpcare_tweets ||= reduce_by_keywords(self.class.trumpcare_keyword_regex)
   end
 
-  def trumpcare_keyword_regex
+  def self.trumpcare_keyword_regex
     /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare)/
   end
 
   def russia_tweets
-    @_russia_tweets ||= reduce_by_keywords(russia_keyword_regex)
+    @_russia_tweets ||= reduce_by_keywords(self.class.russia_keyword_regex)
   end
 
-  def russia_keyword_regex
+  def self.russia_keyword_regex
     /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin)/
   end
 
@@ -78,7 +81,7 @@ class TrumpcareTracker
   end
 
   def to_s
-    @_to_s ||= "@#{user.screen_name}'s last 7 days\n#{recent_tweets_count} tweets\n"\
+    @_to_s ||= "@#{screen_name.screen_name}'s last 7 days\n#{recent_tweets_count} tweets\n"\
       "#{trumpcare_tweets_count} TrumpCare - #{trumpcare_tweets_percentage}%\n"\
       "#{russia_tweets_count} Russia - #{russia_tweets_percentage}%\n"\
       "#{trumpcare_to_russia_tweets_ratio} TrumpCare tweets for every Russia tweet"
@@ -97,30 +100,31 @@ class TrumpcareTracker
   end
 
   def trumpcare_tweets_percentage
-    percentage(trumpcare_tweets.count, recent_tweets.count)
+    self.class.percentage(trumpcare_tweets.count, recent_tweets.count)
   end
 
   def russia_tweets_percentage
-    percentage(russia_tweets.count, recent_tweets.count)
+    self.class.percentage(russia_tweets.count, recent_tweets.count)
   end
 
   def trumpcare_to_russia_tweets_ratio
-    ratio(trumpcare_tweets.count, russia_tweets.count)
+    self.class.ratio(trumpcare_tweets.count, russia_tweets.count)
   end
 
-  def ratio(numerator, denominator)
+  def self.ratio(numerator, denominator)
     return 0.0 if denominator.zero?
     (numerator / denominator.to_f).round(4)
   end
 
-  def percentage(numerator, denominator)
+  def self.percentage(numerator, denominator)
     (ratio(numerator, denominator) * 100).round(2)
   end
 
   def to_h
     {
-      senator: user.name,
-      user_name: user.screen_name,
+      senator: user,
+      official_user_name: screen_name.screen_name,
+      alt_user_name: alt_screen_name_screen_name,
       tweets_in_last_seven_days: recent_tweets.count,
       trumpcare_tweet_count: trumpcare_tweets.count,
       tct_percentage: trumpcare_tweets_percentage,
@@ -130,6 +134,11 @@ class TrumpcareTracker
       trumpcare_tweet_urls: trumpcare_tweets.map { |tweet| tweet.uri.to_s },
       russia_tweet_urls: russia_tweets.map { |tweet| tweet.uri.to_s }
     }
+  end
+
+  def alt_screen_name_screen_name
+    return '' unless alt_screen_name
+    alt_screen_name.screen_name
   end
 
   def to_tweet
