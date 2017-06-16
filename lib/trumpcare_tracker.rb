@@ -13,6 +13,23 @@ class TrumpcareTracker
 
   attr_reader :user, :screen_name, :alt_screen_name
 
+  def self.ratio(numerator, denominator)
+    return 0.0 if denominator.zero?
+    (numerator / denominator.to_f).round(4)
+  end
+
+  def self.percentage(numerator, denominator)
+    (ratio(numerator, denominator) * 100).round(2)
+  end
+
+  def self.trumpcare_keyword_regex
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare)/
+  end
+
+  def self.russia_keyword_regex
+    /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin)/
+  end
+
   def initialize(user, screen_name, alt_screen_name = nil)
     @user            = user
     @screen_name     = client.user screen_name
@@ -64,16 +81,8 @@ class TrumpcareTracker
     @_trumpcare_tweets ||= reduce_by_keywords(self.class.trumpcare_keyword_regex)
   end
 
-  def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare)/
-  end
-
   def russia_tweets
     @_russia_tweets ||= reduce_by_keywords(self.class.russia_keyword_regex)
-  end
-
-  def self.russia_keyword_regex
-    /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin)/
   end
 
   def audit
@@ -109,15 +118,6 @@ class TrumpcareTracker
 
   def trumpcare_to_russia_tweets_ratio
     self.class.ratio(trumpcare_tweets.count, russia_tweets.count)
-  end
-
-  def self.ratio(numerator, denominator)
-    return 0.0 if denominator.zero?
-    (numerator / denominator.to_f).round(4)
-  end
-
-  def self.percentage(numerator, denominator)
-    (ratio(numerator, denominator) * 100).round(2)
   end
 
   def to_h
