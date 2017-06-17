@@ -10,9 +10,18 @@ class TrumpcareTracker
   # require 'trumpcare_tracker/reporters'
   # TrumpcareTracker::Reporters.new
   #
-  # $ bundle exec rake tracker:export
-  # $ bundle exec rake tracker:homepage_scraper
-  class Reporters < RakeTask
+  # $ bundle exec rake tracker:export:senate_democrats
+  # $ bundle exec rake tracker:export:house_democrats
+  # $ bundle exec rake tracker:export:senate_republicans
+  # $ bundle exec rake tracker:export:house_republicans
+  # $ bundle exec rake tracker:export:all
+  #
+  # $ bundle exec rake tracker:homepage_scraper:senate_democrats
+  # $ bundle exec rake tracker:homepage_scraper:house_democrats
+  # $ bundle exec rake tracker:homepage_scraper:senate_republicans
+  # $ bundle exec rake tracker:homepage_scraper:house_republicans
+  # $ bundle exec rake tracker:homepage_scraper:all
+class Reporters < RakeTask
     include RakeTask::Methods
 
     def initialize
