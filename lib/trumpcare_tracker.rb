@@ -22,7 +22,7 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a)/
   end
 
   def self.russia_keyword_regex
@@ -71,8 +71,20 @@ class TrumpcareTracker
 
   def reduce_by_keywords(regex)
     recent_tweets.each_with_object([]) do |tweet, memo|
-      full_text = client.status(tweet.id, tweet_mode: 'extended').attrs[:full_text]
-      memo << tweet if full_text.downcase.match?(regex)
+      tweet_with_full_text = client.status(tweet.id, tweet_mode: 'extended')
+      memo << tweet if tweet_match?(tweet_with_full_text, regex)
+    end
+  end
+
+  def tweet_match?(tweet, regex)
+    full_text = tweet.attrs[:full_text]
+    if full_text.downcase.match?(regex)
+      true
+    elsif tweet.quoted_tweet?
+      quoted_tweet = client.status(tweet.quoted_tweet.id, tweet_mode: 'extended')
+      tweet_match?(quoted_tweet, regex)
+    else
+      false
     end
   end
 
