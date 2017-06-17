@@ -22,7 +22,7 @@ class TrumpcareTracker
           tracker = TrumpcareTracker.new('TrumpCareTracker', screen_name)
           tweet = Twitter::Tweet.new(id: nil)
           first_tweet = tracker.client.update(first_tweet_block.call) if block_given?
-          reps.each_with_index do |rep, i|
+          democrats.each_with_index do |rep, i|
             next if rep.twitter.nil?
             reply_to_tweet = if i.zero?
                                first_tweet

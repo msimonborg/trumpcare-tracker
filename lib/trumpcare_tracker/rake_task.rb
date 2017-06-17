@@ -10,7 +10,7 @@ class TrumpcareTracker
   # Base rake task class
   class RakeTask < Rake::TaskLib
     module Methods
-      def reps
+      def democrats
         democrats = PYR.reps do |r|
           r.democrat = true
           r.chamber  = 'upper'
@@ -22,6 +22,15 @@ class TrumpcareTracker
         end
 
         democrats.objects.to_a + independents.objects.to_a
+      end
+
+      def republicans
+        republicans = PYR.reps do |r|
+          r.republican = true
+          r.chamber = 'upper'
+        end
+
+        republicans.objects
       end
 
       def handles

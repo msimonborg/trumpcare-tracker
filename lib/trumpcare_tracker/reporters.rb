@@ -38,10 +38,10 @@ class TrumpcareTracker
               trumpcare_tweet_urls
               russia_tweet_urls
             ]
-            audit_tweets(reps) { |tracker| csv << tracker.to_h.values }
+            audit_tweets(democrats) { |tracker| csv << tracker.to_h.values }
           end
 
-          File.open('trumpcare_tweet_report.csv', 'w') do |file|
+          File.open('trumpcare_tweet_report_republicans.csv', 'w') do |file|
             file.write csv_tweet_report
           end
         end
@@ -56,7 +56,7 @@ class TrumpcareTracker
         task :homepage_scraper do
           csv_homepage_report = CSV.generate do |csv|
             csv << %w[senator url trumpcare_mentions russia_mentions trumpcare_to_russia_ratio]
-            reps.each do |rep|
+            democrats.each do |rep|
               doc = Nokogiri::HTML(open(rep.url))
               trumpcare_mentions_count = mentions_mapper(doc, TrumpcareTracker.trumpcare_keyword_regex).count
               russia_mentions_count = mentions_mapper(doc, TrumpcareTracker.russia_keyword_regex).count
