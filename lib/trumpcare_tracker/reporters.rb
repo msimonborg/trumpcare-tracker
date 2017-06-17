@@ -24,14 +24,26 @@ class TrumpcareTracker
       namespace :tracker do
         namespace :export do
           desc 'Output a report of Senate Democrats Trumpcare tweets'
-          task :democrats do
-            export(:democrats)
+          task :senate_democrats do
+            export(:senate_democrats)
+          end
+
+          desc 'Output a report of House Democrats Trumpcare tweets'
+          task :house_democrats do
+            export(:house_democrats)
           end
 
           desc 'Output a report of Senate Republicans Trumpcare tweets'
-          task :republicans do
-            export(:republicans)
+          task :senate_republicans do
+            export(:senate_republicans)
           end
+
+          desc 'Output a report of House Republicans Trumpcare tweets'
+          task :house_republicans do
+            export(:house_republicans)
+          end
+
+          all_tasks
         end
       end
     end
@@ -65,15 +77,27 @@ class TrumpcareTracker
       namespace :tracker do
         desc 'Search Senators\' official homepage for TrumpCare and Russia Mentions'
         namespace :homepage_scraper do
-          desc 'Search Democrat\'s homepages'
-          task :democrats do
-            homepage_scraper(:democrats)
+          desc 'Search Senate Democrat\'s homepages'
+          task :senate_democrats do
+            homepage_scraper(:senate_democrats)
           end
 
-          desc 'Search Republican\'s homepages'
-          task :republicans do
-            homepage_scraper(:republicans)
+          desc 'Search House Democrat\'s homepages'
+          task :house_democrats do
+            homepage_scraper(:house_democrats)
           end
+
+          desc 'Search Senate Republican\'s homepages'
+          task :senate_republicans do
+            homepage_scraper(:senate_republicans)
+          end
+
+          desc 'Search House Republican\'s homepages'
+          task :house_republicans do
+            homepage_scraper(:house_republicans)
+          end
+
+          all_tasks
         end
       end
     end
@@ -99,6 +123,11 @@ class TrumpcareTracker
       File.open("trumpcare_homepage_report_#{caucus}.csv", 'w') do |file|
         file.write csv_homepage_report
       end
+    end
+
+    def all_tasks
+      desc 'Run for each caucus'
+      task(all: [:senate_democrats, :house_democrats, :senate_republicans, :house_republicans])
     end
   end
 end

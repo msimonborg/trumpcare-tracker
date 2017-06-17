@@ -22,19 +22,19 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|medicaid|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs|showusthebill|show us the bill)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|medicaid|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca.| aca |aca |o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs|showusthebill|show us the bill)/
   end
 
   def self.russia_keyword_regex
     /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin)/
   end
 
-  def initialize(user, screen_name, alt_screen_name = nil)
+  def initialize(user, screen_name, alt_screen_name = '')
     @audited         = false
     @requests        = 0
     @user            = user
-    @screen_name     = client.user screen_name
-    @alt_screen_name = client.user alt_screen_name if alt_screen_name
+    @screen_name     = screen_name.to_s
+    @alt_screen_name = alt_screen_name.to_s
   end
 
   def audited?
@@ -57,7 +57,7 @@ class TrumpcareTracker
 
   # Make two cursored API calls to fetch the 400 most recent tweets
   def fetch_timeline(screen_name)
-    return [] unless screen_name
+    return [] if screen_name.to_s.empty?
     @requests += 2
     timeline = client.user_timeline(screen_name, exclude_replies: true, count: 200)
     timeline + client.user_timeline(
@@ -118,7 +118,7 @@ class TrumpcareTracker
 
   def to_s
     audit unless audited?
-    @_to_s ||= "@#{screen_name.screen_name}'s last 7 days\n#{recent_tweets_count} tweets\n"\
+    @_to_s ||= "@#{screen_name}'s last 7 days\n#{recent_tweets_count} tweets\n"\
       "#{trumpcare_tweets_count} TrumpCare - #{trumpcare_tweets_percentage}%\n"\
       "#{russia_tweets_count} Russia - #{russia_tweets_percentage}%\n"\
       "#{trumpcare_to_russia_tweets_ratio} TrumpCare tweets for every Russia tweet"
@@ -158,8 +158,8 @@ class TrumpcareTracker
   def to_h
     {
       senator: user,
-      official_user_name: screen_name.screen_name,
-      alt_user_name: alt_screen_name_screen_name,
+      official_user_name: screen_name,
+      alt_user_name: alt_screen_name,
       tweets_in_last_seven_days: recent_tweets.count,
       trumpcare_tweet_count: trumpcare_tweets.count,
       tct_percentage: trumpcare_tweets_percentage,
@@ -169,11 +169,6 @@ class TrumpcareTracker
       trumpcare_tweet_urls: trumpcare_tweets.map { |tweet| tweet.uri.to_s },
       russia_tweet_urls: russia_tweets.map { |tweet| tweet.uri.to_s }
     }
-  end
-
-  def alt_screen_name_screen_name
-    return '' unless alt_screen_name
-    alt_screen_name.screen_name
   end
 
   def to_tweet(options = {})

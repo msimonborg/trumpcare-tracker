@@ -10,27 +10,47 @@ class TrumpcareTracker
   # Base rake task class
   class RakeTask < Rake::TaskLib
     module Methods
-      def democrats
+      def democrats(chamber = '')
+        chamber = chamber.to_s
+
         democrats = PYR.reps do |r|
           r.democrat = true
-          r.chamber  = 'upper'
+          r.chamber  = chamber unless chamber.empty?
         end
 
         independents = PYR.reps do |r|
           r.independent = true
-          r.chamber     = 'upper'
+          r.chamber     = chamber unless chamber.empty?
         end
 
         democrats.objects.to_a + independents.objects.to_a
       end
 
-      def republicans
+      def senate_democrats
+        democrats('upper')
+      end
+
+      def house_democrats
+        democrats('lower')
+      end
+
+      def republicans(chamber = '')
+        chamber = chamber.to_s
+
         republicans = PYR.reps do |r|
           r.republican = true
-          r.chamber = 'upper'
+          r.chamber = chamber unless chamber.empty?
         end
 
         republicans.objects
+      end
+
+      def senate_republicans
+        republicans('upper')
+      end
+
+      def house_republicans
+        republicans('lower')
       end
 
       def handles
@@ -39,21 +59,28 @@ class TrumpcareTracker
 
       def audit_rep(i, rep, &block)
         puts "Sending requests to Twitter API for #{rep.official_full}"
-        alt_screen_name = handles.detect do |handle|
+        rep_handles = handles.detect do |handle|
           handle['official'].downcase.strip == rep.twitter.downcase.strip
-        end['personal/campaign']
+        end
+
+        alt_screen_name = if rep_handles
+          rep_handles['personal/campaign']
+        end
+
         tracker = TrumpcareTracker.new(rep.official_full, rep.twitter, alt_screen_name)
         start_time = Time.now
         tracker.audit
         duration = (Time.now - start_time).round(2)
         puts tracker.to_s
         block.call(tracker, rep) if block_given?
+
         puts "#{i + 1} down. #{tracker.requests} requests took #{duration} seconds."
         interval = tracker.requests - duration
         if interval.positive?
           puts "Waiting #{interval} seconds to avoid hitting API limit"
           sleep(interval)
         end
+
       rescue Twitter::Error::TooManyRequests
         puts 'Rate limit exceeded, waiting 5 minutes'
         sleep(300)
