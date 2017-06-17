@@ -45,11 +45,14 @@ TrumpcareTracker::Reporters.new
 run the tasks like so
 
 ```
-bundle exec rake tracker:tweet_bot # Audit tweets and post to Twitter timeline with Senator's phone numbers
+bundle exec rake tracker:tweet_bot:democrats
+bundle exec rake tracker:tweet_bot:republicans # Audit tweets and post to Twitter timeline with Senator's phone numbers
 
-bundle exec rake tracker:export # Audit tweets and export to CSV
+bundle exec rake tracker:export:democrats
+bundle exec rake tracker:export:republicans # Audit tweets and export to CSV
 
-bundle exec rake tracker:homepage_scraper # Audit websites and export to CSV
+bundle exec rake tracker:homepage_scraper:democrats
+bundle exec rake tracker:homepage_scraper:republicans # Audit websites and export to CSV
 ```
 
 ## Development
