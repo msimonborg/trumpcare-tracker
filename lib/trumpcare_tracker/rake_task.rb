@@ -34,10 +34,17 @@ class TrumpcareTracker
           handle['official'].downcase.strip == rep.twitter.downcase.strip
         end['personal/campaign']
         tracker = TrumpcareTracker.new(rep.official_full, rep.twitter, alt_screen_name)
+        start_time = Time.now
         tracker.audit
+        duration = (Time.now - start_time).round(2)
+        puts tracker.to_s
         block.call(tracker, rep) if block_given?
-        puts "#{i + 1} down. Pausing for 45 seconds to avoid hitting API rate limit."
-        sleep(45)
+        puts "#{i + 1} down. #{tracker.requests} requests took #{duration} seconds."
+        interval = tracker.requests - duration
+        if interval.positive?
+          puts "Waiting #{interval} seconds to avoid hitting API limit"
+          sleep(interval)
+        end
       rescue Twitter::Error::TooManyRequests
         puts 'Rate limit exceeded, waiting 5 minutes'
         sleep(300)

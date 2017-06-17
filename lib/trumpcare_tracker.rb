@@ -10,7 +10,7 @@ class TrumpcareTracker
   ACCESS_TOKEN        = ENV['TCT_ACCESS_TOKEN']
   ACCESS_TOKEN_SECRET = ENV['TCT_ACCESS_TOKEN_SECRET']
 
-  attr_reader :user, :screen_name, :alt_screen_name
+  attr_reader :user, :screen_name, :alt_screen_name, :requests
 
   def self.ratio(numerator, denominator)
     return 0.0 if denominator.zero?
@@ -22,7 +22,7 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|medicaid|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|medicaid|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs|showusthebill|show us the bill)/
   end
 
   def self.russia_keyword_regex
@@ -30,9 +30,15 @@ class TrumpcareTracker
   end
 
   def initialize(user, screen_name, alt_screen_name = nil)
+    @audited         = false
+    @requests        = 0
     @user            = user
     @screen_name     = client.user screen_name
     @alt_screen_name = client.user alt_screen_name if alt_screen_name
+  end
+
+  def audited?
+    @audited
   end
 
   # Instantiate a Twitter Rest Client with API authorization
@@ -52,6 +58,7 @@ class TrumpcareTracker
   # Make two cursored API calls to fetch the 400 most recent tweets
   def fetch_timeline(screen_name)
     return [] unless screen_name
+    @requests += 2
     timeline = client.user_timeline(screen_name, exclude_replies: true, count: 200)
     timeline + client.user_timeline(
       screen_name,
@@ -69,11 +76,19 @@ class TrumpcareTracker
     end
   end
 
-  def reduce_by_keywords(regex)
+  def filter_by_keywords
     recent_tweets.each_with_object([]) do |tweet, memo|
-      tweet_with_full_text = client.status(tweet.id, tweet_mode: 'extended')
-      memo << tweet if tweet_match?(tweet_with_full_text, regex)
+      tweet_with_full_text = fetch_tweet_with_full_text(tweet)
+      stats[:trumpcare_tweets] << tweet if tweet_match?(tweet_with_full_text,
+                                                        self.class.trumpcare_keyword_regex)
+      stats[:russia_tweets] << tweet if tweet_match?(tweet_with_full_text,
+                                                     self.class.russia_keyword_regex)
     end
+  end
+
+  def fetch_tweet_with_full_text(tweet)
+    @requests += 1
+    client.status(tweet.id, tweet_mode: 'extended')
   end
 
   def tweet_match?(tweet, regex)
@@ -81,7 +96,7 @@ class TrumpcareTracker
     if full_text.downcase.match?(regex)
       true
     elsif tweet.quoted_tweet?
-      quoted_tweet = client.status(tweet.quoted_tweet.id, tweet_mode: 'extended')
+      quoted_tweet = fetch_tweet_with_full_text(tweet.quoted_tweet)
       tweet_match?(quoted_tweet, regex)
     else
       false
@@ -89,18 +104,20 @@ class TrumpcareTracker
   end
 
   def trumpcare_tweets
-    @_trumpcare_tweets ||= reduce_by_keywords(self.class.trumpcare_keyword_regex)
+    stats[:trumpcare_tweets]
   end
 
   def russia_tweets
-    @_russia_tweets ||= reduce_by_keywords(self.class.russia_keyword_regex)
+    stats[:russia_tweets]
   end
 
   def audit
-    puts to_s
+    filter_by_keywords unless audited?
+    @audited = true
   end
 
   def to_s
+    audit unless audited?
     @_to_s ||= "@#{screen_name.screen_name}'s last 7 days\n#{recent_tweets_count} tweets\n"\
       "#{trumpcare_tweets_count} TrumpCare - #{trumpcare_tweets_percentage}%\n"\
       "#{russia_tweets_count} Russia - #{russia_tweets_percentage}%\n"\
@@ -109,6 +126,13 @@ class TrumpcareTracker
 
   def recent_tweets_count
     @_recent_tweets_count ||= recent_tweets.count
+  end
+
+  def stats
+    @_stats ||= {
+      trumpcare_tweets: [],
+      russia_tweets: []
+    }
   end
 
   def trumpcare_tweets_count
@@ -120,15 +144,15 @@ class TrumpcareTracker
   end
 
   def trumpcare_tweets_percentage
-    self.class.percentage(trumpcare_tweets.count, recent_tweets.count)
+    self.class.percentage(trumpcare_tweets_count, recent_tweets_count)
   end
 
   def russia_tweets_percentage
-    self.class.percentage(russia_tweets.count, recent_tweets.count)
+    self.class.percentage(russia_tweets_count, recent_tweets_count)
   end
 
   def trumpcare_to_russia_tweets_ratio
-    self.class.ratio(trumpcare_tweets.count, russia_tweets.count)
+    self.class.ratio(trumpcare_tweets_count, russia_tweets_count)
   end
 
   def to_h
@@ -153,6 +177,7 @@ class TrumpcareTracker
   end
 
   def to_tweet(options = {})
+    @requests += 1
     client.update(".#{self}", options)
   end
 end
