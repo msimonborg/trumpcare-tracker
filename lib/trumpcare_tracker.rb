@@ -22,7 +22,7 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medication|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medication|medicaid|prescription|vaccine|obamacare|cbo|premiums|insurance|deductibles|aca|o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs)/
   end
 
   def self.russia_keyword_regex
