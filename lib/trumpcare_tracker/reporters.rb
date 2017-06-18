@@ -10,47 +10,37 @@ class TrumpcareTracker
   # require 'trumpcare_tracker/reporters'
   # TrumpcareTracker::Reporters.new
   #
-  # $ bundle exec rake tracker:export:senate_democrats
-  # $ bundle exec rake tracker:export:house_democrats
-  # $ bundle exec rake tracker:export:senate_republicans
-  # $ bundle exec rake tracker:export:house_republicans
-  # $ bundle exec rake tracker:export:all
+  # $ rake tracker:export:senate_democrats
+  # $ rake tracker:export:house_democrats
+  # $ rake tracker:export:senate_republicans
+  # $ rake tracker:export:house_republicans
+  # $ rake tracker:export:all
   #
-  # $ bundle exec rake tracker:homepage_scraper:senate_democrats
-  # $ bundle exec rake tracker:homepage_scraper:house_democrats
-  # $ bundle exec rake tracker:homepage_scraper:senate_republicans
-  # $ bundle exec rake tracker:homepage_scraper:house_republicans
-  # $ bundle exec rake tracker:homepage_scraper:all
+  # $ rake tracker:homepage_scraper:senate_democrats
+  # $ rake tracker:homepage_scraper:house_democrats
+  # $ rake tracker:homepage_scraper:senate_republicans
+  # $ rake tracker:homepage_scraper:house_republicans
+  # $ rake tracker:homepage_scraper:all
 class Reporters < RakeTask
-    include RakeTask::Methods
-
     def initialize
       export_task
       homepage_scraper_task
     end
 
     def export_task
-      namespace :tracker do
-        namespace :export do
+      namespace(:tracker) do
+        namespace(:export) do
           desc 'Output a report of Senate Democrats Trumpcare tweets'
-          task :senate_democrats do
-            export(:senate_democrats)
-          end
+          task(:senate_democrats) { export(:senate_democrats) }
 
           desc 'Output a report of House Democrats Trumpcare tweets'
-          task :house_democrats do
-            export(:house_democrats)
-          end
+          task(:house_democrats) { export(:house_democrats) }
 
           desc 'Output a report of Senate Republicans Trumpcare tweets'
-          task :senate_republicans do
-            export(:senate_republicans)
-          end
+          task(:senate_republicans) { export(:senate_republicans) }
 
           desc 'Output a report of House Republicans Trumpcare tweets'
-          task :house_republicans do
-            export(:house_republicans)
-          end
+          task(:house_republicans) { export(:house_republicans) }
 
           all_tasks
         end
@@ -83,28 +73,20 @@ class Reporters < RakeTask
 
 
     def homepage_scraper_task
-      namespace :tracker do
+      namespace(:tracker) do
         desc 'Search Senators\' official homepage for TrumpCare and Russia Mentions'
-        namespace :homepage_scraper do
+        namespace(:homepage_scraper) do
           desc 'Search Senate Democrat\'s homepages'
-          task :senate_democrats do
-            homepage_scraper(:senate_democrats)
-          end
+          task(:senate_democrats) { homepage_scraper(:senate_democrats) }
 
           desc 'Search House Democrat\'s homepages'
-          task :house_democrats do
-            homepage_scraper(:house_democrats)
-          end
+          task(:house_democrats) { homepage_scraper(:house_democrats) }
 
           desc 'Search Senate Republican\'s homepages'
-          task :senate_republicans do
-            homepage_scraper(:senate_republicans)
-          end
+          task(:senate_republicans) { homepage_scraper(:senate_republicans) }
 
           desc 'Search House Republican\'s homepages'
-          task :house_republicans do
-            homepage_scraper(:house_republicans)
-          end
+          task(:house_republicans) { homepage_scraper(:house_republicans) }
 
           all_tasks
         end

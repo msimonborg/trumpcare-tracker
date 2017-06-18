@@ -26,7 +26,7 @@ class TrumpcareTracker
   end
 
   def self.russia_keyword_regex
-    /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin)/
+    /(russia|comey|sessions|mueller|fbi|flynn|obstruction of justice|collusion|putin|kremlin|kislyak|attorney general| intelligence committee|rosenstein|witch hunt|impeach|perjur|under oath)/
   end
 
   def initialize(user, screen_name, alt_screen_name = '')

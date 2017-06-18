@@ -12,8 +12,6 @@ class TrumpcareTracker
   #
   # $ bundle exec rake tracker:tweet_bot
   class TweetBot < RakeTask
-    include RakeTask::Methods
-
     attr_reader :screen_name, :first_tweet_block
 
     def initialize(screen_name, &first_tweet_block)
@@ -26,14 +24,10 @@ class TrumpcareTracker
       namespace(:tracker) do
         namespace(:tweet_bot) do
           desc 'Audit Democrats Trumpcare tweet activity and post a thread of updates'
-          task(:democrats) do
-            tweet_bot(:democrats)
-          end
+          task(:democrats) { tweet_bot(:democrats) }
 
           desc 'Audit Republicans Trumpcare tweet activity and post a thread of updates'
-          task(:republicans) do
-            tweet_bot(:republicans)
-          end
+          task(:republicans) { tweet_bot(:republicans) }
         end
       end
     end
