@@ -61,6 +61,7 @@ class TrumpcareTracker
     return [] if screen_name.to_s.empty?
     @requests += 2
     timeline = client.user_timeline(screen_name, exclude_replies: true, count: 200)
+    return timeline if timeline.empty?
     timeline + client.user_timeline(
       screen_name,
       exclude_replies: true,
