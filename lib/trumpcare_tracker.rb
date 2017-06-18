@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'date'
 require 'trumpcare_tracker/version'
 require 'twitter'
 
@@ -77,13 +78,16 @@ class TrumpcareTracker
   end
 
   def filter_by_keywords
-    recent_tweets.each_with_object([]) do |tweet, memo|
+    recent_tweets.each do |tweet|
       tweet_with_full_text = fetch_tweet_with_full_text(tweet)
-      stats[:trumpcare_tweets] << tweet if tweet_match?(tweet_with_full_text,
-                                                        self.class.trumpcare_keyword_regex)
-      stats[:russia_tweets] << tweet if tweet_match?(tweet_with_full_text,
-                                                     self.class.russia_keyword_regex)
+      if tweet_match?(tweet_with_full_text, self.class.trumpcare_keyword_regex)
+        stats[:trumpcare_tweets] << tweet
+      elsif tweet_match?(tweet_with_full_text, self.class.russia_keyword_regex)
+        stats[:russia_tweets] << tweet
+      end
     end
+
+    stats
   end
 
   def fetch_tweet_with_full_text(tweet)
