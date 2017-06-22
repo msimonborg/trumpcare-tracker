@@ -23,7 +23,7 @@ class TrumpcareTracker
   end
 
   def self.trumpcare_keyword_regex
-    /(ahca|trumpcare|healthcare|health|care|drug|medic|prescription|vaccin|obamacare|cbo|premiums|insurance|deductibles|aca.| aca |aca |o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs|showusthebill|show us the bill)/
+    /(ahca|trumpcare|healthcare|health|care|drug|medic|prescription|vaccin|obamacare|cbo|premiums|insurance|deductibles|aca.| aca |aca |o-care|a.h.c.a|a.c.a|pre-existing conditions|hhs|showusthebill|show us the bill|opioid)/
   end
 
   def self.russia_keyword_regex
@@ -59,15 +59,27 @@ class TrumpcareTracker
   # Make two cursored API calls to fetch the 400 most recent tweets
   def fetch_timeline(screen_name)
     return [] if screen_name.to_s.empty?
-    @requests += 2
-    timeline = client.user_timeline(screen_name, exclude_replies: true, count: 200)
+    @requests += 1
+    timeline = client.user_timeline(screen_name, tweet_mode: 'extended', count: 200)
     return timeline if timeline.empty?
-    timeline + client.user_timeline(
+    timeline = fetch_older_tweets(timeline, screen_name)
+    puts "Fetched #{screen_name}'s timeline"
+    timeline
+  end
+
+  def fetch_older_tweets(timeline, screen_name)
+    return timeline if age_of_tweet_in_days(timeline.last) > 7
+    @requests += 1
+    first_count = timeline.count
+    timeline += client.user_timeline(
       screen_name,
-      exclude_replies: true,
+      tweet_mode: 'extended',
       max_id: timeline.last.id - 1,
       count: 200
     )
+    second_count = timeline.count
+    return timeline if second_count == first_count
+    fetch_older_tweets(timeline, screen_name)
   end
 
   # Collect a user's tweets within the last 7 days
@@ -78,12 +90,15 @@ class TrumpcareTracker
     end
   end
 
+  def age_of_tweet_in_days(tweet)
+    (Time.now - tweet.created_at) / 86_400
+  end
+
   def filter_by_keywords
     recent_tweets.each do |tweet|
-      tweet_with_full_text = fetch_tweet_with_full_text(tweet)
-      if tweet_match?(tweet_with_full_text, self.class.trumpcare_keyword_regex)
+      if tweet_match?(tweet, self.class.trumpcare_keyword_regex)
         stats[:trumpcare_tweets] << tweet
-      elsif tweet_match?(tweet_with_full_text, self.class.russia_keyword_regex)
+      elsif tweet_match?(tweet, self.class.russia_keyword_regex)
         stats[:russia_tweets] << tweet
       end
     end

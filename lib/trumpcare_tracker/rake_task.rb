@@ -73,13 +73,10 @@ class TrumpcareTracker
       puts tracker.to_s
       block.call(tracker, rep) if block_given?
 
-      puts "#{i + 1} down. #{tracker.requests} requests took #{duration} seconds."
-      interval = tracker.requests - duration
-      if interval.positive?
-        puts "Waiting #{interval} seconds to avoid hitting API limit"
-        sleep(interval)
-      end
-
+      puts "#{i + 1} down. Out of #{tracker.timeline.length} tweets checked,\n"\
+        "#{tracker.recent_tweets.length} were made in the last 7 days.\n"\
+        "The oldest tweet analyzed was created #{tracker.recent_tweets.last&.created_at&.strftime("%H:%M:%S %-m/%-d/%y")}\n"\
+        "#{tracker.requests} requests took #{duration} seconds."
     rescue Twitter::Error::TooManyRequests
       puts 'Rate limit exceeded, waiting 5 minutes'
       sleep(300)
